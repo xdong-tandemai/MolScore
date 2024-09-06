@@ -1,0 +1,14 @@
+name: scscore-env
+channels:
+  - rdkit
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - python=3.10
+  - rdkit
+  - numpy<2
+  - flask=2.2.5
+  - pip
+  - pip:
+    - git+https://github.com/xdong-tandemai/scscore.git@main
