@@ -48,7 +48,7 @@ class MolecularDescriptors:
         self.n_jobs = n_jobs
 
     @staticmethod
-    def calculate_descriptors(smi, prefix):
+    def calculate_descriptors(smi, prefix, subset=None):
         descriptors = {
             "QED": QED.qed,
             "SAscore": sascorer.calculateScore,
@@ -71,7 +71,12 @@ class MolecularDescriptors:
             "MaxConsecutiveRotatableBonds": MolecularDescriptors.max_consecutive_rotatable_bonds,
             "FlourineCount": MolecularDescriptors.flourine_count,
         }
-        descriptors = {f"{prefix}_{k}": v for k, v in descriptors.items()}
+        if not subset:
+            descriptors = {f"{prefix}_{k}": v for k, v in descriptors.items()}
+        else:
+            descriptors = {
+                f"{prefix}_{k}": v for k, v in descriptors.items() if k in subset
+            }
 
         result = {"smiles": smi}
         mol = get_mol(smi)
@@ -261,7 +266,9 @@ class MolecularDescriptors:
         """
         with Pool(self.n_jobs) as pool:
             pcalculate_descriptors = partial(
-                self.calculate_descriptors, prefix=self.prefix
+                self.calculate_descriptors,
+                prefix=self.prefix,
+                subset=self.return_metrics,
             )
             results = [result for result in pool.imap(pcalculate_descriptors, smiles)]
 
